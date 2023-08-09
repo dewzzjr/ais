@@ -31,7 +31,7 @@ func TestFetchArticles(t *testing.T) {
 	t.Run("ShouldReturnResult_WhenExpectSelectAll", func(t *testing.T) {
 		db, mock := setup(t)
 		mock.ExpectQuery(
-			"SELECT (.+) FROM `articles` WHERE `articles`.`deleted_at` IS NULL").
+			"SELECT (.+) FROM `articles` WHERE `articles`.`deleted_at` IS NULL ORDER BY `created_at` DESC").
 			WillReturnRows(
 				sqlmock.NewRows([]string{"id", "title", "body", "author", "created_at", "updated_at"}).
 					AddRow(1, "title test", "body test", "author test", time.Now().Truncate(time.Minute), sql.NullTime{}),
