@@ -8,6 +8,6 @@ import (
 )
 
 type Article interface {
-	Fetch(context.Context) ([]model.Article, error)
-	Insert(context.Context, model.Article) error
+	FetchArticles(context.Context) ([]model.Article, error)
+	InsertArticle(context.Context, model.Article) error
 }
