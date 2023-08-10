@@ -1,4 +1,4 @@
-OS=Linux
+OS=linux
 ARCH=x86_64
 MOCKGEN_VERSION=1.6.0
 
@@ -21,7 +21,7 @@ mod:
 	go mod vendor
 
 build:
-	GOOS=linux go build -o bin/ais .
+	GOOS=${OS} go build -o bin/server cmd/server/main.go
 
 generate:
 	go generate ./...
