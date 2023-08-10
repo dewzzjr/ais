@@ -1,0 +1,40 @@
+version: '3.8'
+services:
+  app:
+    build:
+      context: .
+    ports:
+      - 9000:9000
+    restart: on-failure
+    container_name: api_app
+    volumes:
+      - .:/app
+    environment:
+      - DATA_SOURCE_NAME=${DB_USER}:${DB_PASSWORD}@tcp(db:3306)/${DB_NAME}?charset=utf8mb4&parseTime=True
+      - WAIT_HOSTS=db:3306
+    env_file:
+      - ./.env
+    depends_on:
+      - db
+    networks:
+      - default
+  db:
+    image: mysql:8.1.0
+    container_name: mysql_articles_db
+    restart: always
+    environment:
+      MYSQL_DATABASE: ${DB_NAME}
+      MYSQL_USER: ${DB_USER}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+    ports:
+      - '${DB_PORT}:3306'
+    volumes:
+      - mysql_db:/var/lib/mysql
+    networks:
+      - default
+networks:
+  default:
+    driver: bridge
+volumes:
+  mysql_db:

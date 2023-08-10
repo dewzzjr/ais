@@ -20,8 +20,20 @@ mod:
 	go mod tidy
 	go mod vendor
 
+env:
+ifneq ($(wildcard .env),)
+	cp .env .env.backup
+endif
+	cp .env.example .env
+
 build:
-	GOOS=${OS} go build -o bin/server cmd/server/main.go
+	GO111MODULE=on CGO_ENABLED=0 GOOS=linux go build -o bin/server cmd/server/main.go
+
+remove-docker:
+	docker-compose down
+
+build-docker: build
+	docker-compose up --build
 
 generate:
 	go generate ./...

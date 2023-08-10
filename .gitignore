@@ -1,3 +1,10 @@
+# Dependency directories (remove the comment below to include it)
 vendor
+
+# Binaries for programs and plugins
 bin/*
 !bin/.keep
+
+# Environment Variable
+.env
+.env.backup

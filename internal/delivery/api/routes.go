@@ -23,8 +23,6 @@ func (d *delivery) Route() *mux.Router {
 
 func (d *delivery) Start() {
 	_ = d.Route()
-	go func() {
-	}()
 	stopC := make(chan os.Signal, 1)
 	signal.Notify(stopC, os.Interrupt, syscall.SIGTERM)
 	wg := sync.WaitGroup{}
@@ -36,13 +34,13 @@ func (d *delivery) Start() {
 		defer wg.Done()
 		defer cancel()
 		if err := d.Shutdown(ctx); err != nil {
-			log.Fatal(err)
+			log.Println(err)
 		}
 	}()
 
 	log.Println("server starting...")
 	if err := d.Server.ListenAndServe(); err != nil {
-		log.Fatal(err)
+		log.Println(err)
 	}
 	wg.Wait()
 	log.Println("server stopping...")
