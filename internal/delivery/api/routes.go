@@ -10,11 +10,13 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/dewzzjr/ais/pkg/middleware"
 	"github.com/gorilla/mux"
 )
 
 func (d *delivery) Route() *mux.Router {
 	r := mux.NewRouter()
+	r.Use()
 	r.HandleFunc("/articles", d.FetchArticles).Methods(http.MethodGet)
 	r.HandleFunc("/articles", d.CreateArticles).Methods(http.MethodPost)
 	d.Server.Handler = r
@@ -22,7 +24,11 @@ func (d *delivery) Route() *mux.Router {
 }
 
 func (d *delivery) Start() {
-	_ = d.Route()
+	r := d.Route()
+	r.Use(
+		middleware.Logger,
+		mux.CORSMethodMiddleware(r),
+	)
 	stopC := make(chan os.Signal, 1)
 	signal.Notify(stopC, os.Interrupt, syscall.SIGTERM)
 	wg := sync.WaitGroup{}
