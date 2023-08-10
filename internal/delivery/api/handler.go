@@ -23,7 +23,12 @@ func (d *delivery) CreateArticles(w http.ResponseWriter, r *http.Request) {
 }
 
 func (d *delivery) FetchArticles(w http.ResponseWriter, r *http.Request) {
-	articles, err := d.Article.Fetch(r.Context())
+	var filter model.Filter
+	if err := request.Read(r, &filter, request.Query); err != nil {
+		response.Error(w, errs.Wrap(http.StatusBadRequest, err))
+		return
+	}
+	articles, err := d.Article.Fetch(r.Context(), filter)
 	if err != nil {
 		response.Error(w, err)
 		return

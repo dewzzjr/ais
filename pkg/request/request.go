@@ -39,7 +39,7 @@ func Read(r *http.Request, obj interface{}, opts ...Options) (err error) {
 				return
 			}
 		case JSON:
-			if usedBody {
+			if usedBody || r.Body == http.NoBody {
 				continue
 			}
 			err = json.NewDecoder(r.Body).Decode(obj)
@@ -49,7 +49,7 @@ func Read(r *http.Request, obj interface{}, opts ...Options) (err error) {
 			r.Body.Close()
 			usedBody = true
 		case PostForm:
-			if usedBody {
+			if usedBody || r.Body == http.NoBody {
 				continue
 			}
 			err = r.ParseForm()
