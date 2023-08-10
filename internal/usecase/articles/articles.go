@@ -7,7 +7,7 @@ import (
 )
 
 func (u *usecase) Fetch(c context.Context, filter model.Filter) ([]model.Article, error) {
-	return u.Article.FetchArticles(c)
+	return u.Article.FetchArticles(c, filter)
 }
 
 func (u *usecase) Insert(c context.Context, payload model.Article) error {

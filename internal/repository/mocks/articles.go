@@ -36,18 +36,18 @@ func (m *MockArticle) EXPECT() *MockArticleMockRecorder {
 }
 
 // FetchArticles mocks base method.
-func (m *MockArticle) FetchArticles(arg0 context.Context) ([]model.Article, error) {
+func (m *MockArticle) FetchArticles(arg0 context.Context, arg1 model.Filter) ([]model.Article, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "FetchArticles", arg0)
+	ret := m.ctrl.Call(m, "FetchArticles", arg0, arg1)
 	ret0, _ := ret[0].([]model.Article)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // FetchArticles indicates an expected call of FetchArticles.
-func (mr *MockArticleMockRecorder) FetchArticles(arg0 interface{}) *gomock.Call {
+func (mr *MockArticleMockRecorder) FetchArticles(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FetchArticles", reflect.TypeOf((*MockArticle)(nil).FetchArticles), arg0)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FetchArticles", reflect.TypeOf((*MockArticle)(nil).FetchArticles), arg0, arg1)
 }
 
 // InsertArticle mocks base method.

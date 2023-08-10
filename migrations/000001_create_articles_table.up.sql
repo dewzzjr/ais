@@ -6,5 +6,6 @@ CREATE TABLE articles (
     created_at timestamp,
     updated_at timestamp,
     deleted_at timestamp,
-    PRIMARY KEY (id)
+    PRIMARY KEY (id),
+    FULLTEXT (title, body)
 );

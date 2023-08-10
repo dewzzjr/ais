@@ -9,6 +9,7 @@ import (
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/dewzzjr/ais/internal/model"
 	"github.com/dewzzjr/ais/internal/repository/sqldb"
+	"github.com/dewzzjr/ais/pkg/pointer"
 	"github.com/stretchr/testify/assert"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
@@ -40,9 +41,26 @@ func TestFetchArticles(t *testing.T) {
 			{Author: "author test", Title: "title test", Body: "body test", Model: gorm.Model{ID: 1, CreatedAt: time.Now().Truncate(time.Minute)}},
 		}
 		r := sqldb.New(db)
-		gotResult, err := r.FetchArticles(context.Background())
+		gotResult, err := r.FetchArticles(context.Background(), model.Filter{})
 		assert.NoError(t, err)
-		assert.EqualValues(t, gotResult, expectResult)
+		assert.EqualValues(t, expectResult, gotResult)
+	})
+	t.Run("ShouldReturnResult_WhenExpectSelectWithFilter", func(t *testing.T) {
+		db, mock := setup(t)
+		mock.ExpectQuery(
+			"SELECT (.+) FROM `articles` WHERE MATCH(.+) AGAINST(.+) AND `articles`.`deleted_at` IS NULL ORDER BY `created_at` DESC").
+			WithArgs("test").
+			WillReturnRows(
+				sqlmock.NewRows([]string{"id", "title", "body", "author", "created_at", "updated_at"}).
+					AddRow(1, "title test", "body test", "author test", time.Now().Truncate(time.Minute), sql.NullTime{}),
+			)
+		expectResult := []model.Article{
+			{Author: "author test", Title: "title test", Body: "body test", Model: gorm.Model{ID: 1, CreatedAt: time.Now().Truncate(time.Minute)}},
+		}
+		r := sqldb.New(db)
+		gotResult, err := r.FetchArticles(context.Background(), model.Filter{Query: pointer.New("test")})
+		assert.NoError(t, err)
+		assert.EqualValues(t, expectResult, gotResult)
 	})
 }
 
