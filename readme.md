@@ -15,6 +15,20 @@ The outer layer can access inside layer but can't be vise versa. The order from 
 ```
 controller --> usecase --> repository --> model
 ```
+## Requirements
+Here is several requirements to run this project, the version is based on what I have tested on my local machine.
+- GoLang 1.18
+- Docker 20.10.17
+- Docker Compose 1.29.2
+- Make 4.2.1
+- Visual Studio Code (recommended)
+- Linux Ubuntu 18.04 LTS (recommended)
+
+## How to run
+- Run `make test` in the terminal to check if everything is working. This command will download the library vendor, run unit test, and build binary for each service.
+- Run `make env` in the terminal to generate `.env` file which contaon the environment variables for the project.
+- Try to run `make build-docker` in the terminal to build the docker image and create container for the services. It will take a while to build the image, and let the terminal open when the service already running.
+- Next, we need to migrate the database schema to the docker container. Open another terminal and run `make migrate`.
 
 ## Reference
 - [Golang Standard Project Layout](https://github.com/golang-standards/project-layout)
