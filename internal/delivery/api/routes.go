@@ -44,7 +44,7 @@ func (d *delivery) Start() {
 		}
 	}()
 
-	log.Println("server starting...")
+	log.Printf("server starting [%s]...\n", d.Config.Address)
 	if err := d.Server.ListenAndServe(); err != nil {
 		log.Println(err)
 	}

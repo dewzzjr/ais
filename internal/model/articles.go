@@ -1,6 +1,7 @@
 package model
 
 import (
+	"encoding/json"
 	"errors"
 	"net/http"
 
@@ -34,4 +35,12 @@ func (m Article) Validate() error {
 	}
 
 	return nil
+}
+
+func (m *Article) MarshalBinary() ([]byte, error) {
+	return json.Marshal(m)
+}
+
+func (p *Article) UnmarshalBinary(data []byte) error {
+	return json.Unmarshal(data, p)
 }

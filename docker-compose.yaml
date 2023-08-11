@@ -4,20 +4,24 @@ services:
     build:
       context: .
     ports:
-      - 9000:9000
+      - ${APP_PORT}:9000
     restart: on-failure
-    container_name: api_app
+    container_name: api_articles_app
     volumes:
       - .:/app
     environment:
+      - API_ADDRESS=:9000
       - DATA_SOURCE_NAME=${DB_USER}:${DB_PASSWORD}@tcp(db:3306)/${DB_NAME}?charset=utf8mb4&parseTime=True
-      - WAIT_HOSTS=db:3306
+      - REDIS_ADDRESS=cache:6379
+      - WAIT_HOSTS=db:3306,cache:6379
     env_file:
       - ./.env
     depends_on:
       - db
-    networks:
-      - default
+      - cache
+    links:
+      - db
+      - cache
   db:
     image: mysql:8.1.0
     container_name: mysql_articles_db
@@ -30,11 +34,18 @@ services:
     ports:
       - '${DB_PORT}:3306'
     volumes:
-      - mysql_db:/var/lib/mysql
-    networks:
-      - default
-networks:
-  default:
-    driver: bridge
+      - db:/var/lib/mysql
+  cache:
+    image: redis:6.2-alpine
+    container_name: redis_articles_cache
+    restart: always
+    ports:
+      - '${REDIS_PORT}:6379'
+    command: redis-server
+    volumes:
+      - cache:/data
 volumes:
-  mysql_db:
+  db:
+    driver: local
+  cache:
+    driver: local

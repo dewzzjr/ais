@@ -46,13 +46,18 @@ build:
 	go build -o bin/server cmd/server/main.go
 
 remove-docker:
-	docker-compose down
+	docker-compose -p "articles" down
 
 build-docker: build
-	docker-compose up --build
+	docker-compose -p "articles" up --build
 
 mysql-docker-up:
 	docker start mysql_articles_db
+
+redis-docker-up:
+	docker start redis_articles_cache
+
+resource-docker-up: mysql-docker-up redis-docker-up
 
 migrate: mysql-docker-up
 	migrate -database='${DB_URL}' -source=file://./migrations up
