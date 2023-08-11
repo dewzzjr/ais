@@ -1,5 +1,5 @@
 CREATE TABLE articles (
-    id int NOT NULL,
+    id int NOT NULL AUTO_INCREMENT,
     author text NOT NULL,
     title text NOT NULL,
     body text NOT NULL,

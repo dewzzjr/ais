@@ -3,6 +3,7 @@ package api
 import (
 	"net/http"
 
+	"github.com/dewzzjr/ais/internal/delivery/api/payload"
 	"github.com/dewzzjr/ais/internal/model"
 	"github.com/dewzzjr/ais/pkg/errs"
 	"github.com/dewzzjr/ais/pkg/request"
@@ -10,12 +11,12 @@ import (
 )
 
 func (d *delivery) CreateArticles(w http.ResponseWriter, r *http.Request) {
-	var payload model.Article
-	if err := request.Read(r, &payload); err != nil {
+	var req payload.ArticleRequest
+	if err := request.Read(r, &req); err != nil {
 		response.Error(w, errs.Wrap(http.StatusBadRequest, err))
 		return
 	}
-	if err := d.Article.Insert(r.Context(), payload); err != nil {
+	if err := d.Article.Insert(r.Context(), req.ToModel()); err != nil {
 		response.Error(w, err)
 		return
 	}
@@ -34,6 +35,6 @@ func (d *delivery) FetchArticles(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	response.Send(w, http.StatusOK, map[string]interface{}{
-		"data": articles,
+		"data": payload.ArticleResponse{}.FromModels(articles),
 	})
 }
