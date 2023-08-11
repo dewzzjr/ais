@@ -48,8 +48,8 @@ func TestFetchArticles(t *testing.T) {
 	t.Run("ShouldReturnResult_WhenExpectSelectWithFilter", func(t *testing.T) {
 		db, mock := setup(t)
 		mock.ExpectQuery(
-			"SELECT (.+) FROM `articles` WHERE MATCH(.+) AGAINST(.+) AND `articles`.`deleted_at` IS NULL ORDER BY `created_at` DESC").
-			WithArgs("test").
+			"SELECT (.+) FROM `articles` WHERE MATCH(.+) AGAINST(.+) AND author = (.+) AND `articles`.`deleted_at` IS NULL ORDER BY `created_at` DESC").
+			WithArgs("test", "author test").
 			WillReturnRows(
 				sqlmock.NewRows([]string{"id", "title", "body", "author", "created_at", "updated_at"}).
 					AddRow(1, "title test", "body test", "author test", time.Now().Truncate(time.Minute), sql.NullTime{}),
@@ -58,7 +58,7 @@ func TestFetchArticles(t *testing.T) {
 			{Author: "author test", Title: "title test", Body: "body test", Model: gorm.Model{ID: 1, CreatedAt: time.Now().Truncate(time.Minute)}},
 		}
 		r := sqldb.New(db)
-		gotResult, err := r.FetchArticles(context.Background(), model.Filter{Query: pointer.New("test")})
+		gotResult, err := r.FetchArticles(context.Background(), model.Filter{Query: pointer.New("test"), Author: pointer.New("author test")})
 		assert.NoError(t, err)
 		assert.EqualValues(t, expectResult, gotResult)
 	})
