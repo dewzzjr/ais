@@ -9,7 +9,7 @@ import (
 	"gorm.io/gorm/clause"
 )
 
-func (r *repo) FetchArticles(c context.Context, filter model.Filter) (result []model.Article, err error) {
+func (r *repo) FetchArticles(c context.Context, filter model.Filter) (results []model.Article, err error) {
 	find := r.db.WithContext(c).
 		Session(&gorm.Session{QueryFields: true}).
 		Model(&model.Article{}).
@@ -23,8 +23,8 @@ func (r *repo) FetchArticles(c context.Context, filter model.Filter) (result []m
 	if pointer.Val(filter.Author) != "" {
 		find.Where("author = ?", filter.Author)
 	}
-	find.Find(&result)
-	return result, find.Error
+	find.Find(&results)
+	return results, find.Error
 }
 
 func (r *repo) InsertArticle(c context.Context, payload model.Article) (*model.Article, error) {
@@ -32,4 +32,9 @@ func (r *repo) InsertArticle(c context.Context, payload model.Article) (*model.A
 		return nil, err
 	}
 	return &payload, nil
+}
+
+func (r *repo) GetArticlesByID(c context.Context, ids ...int64) (results []model.Article, err error) {
+	find := r.db.WithContext(c).Model(model.Article{}).Find(&results, ids)
+	return results, find.Error
 }

@@ -50,6 +50,26 @@ func (mr *MockArticleMockRecorder) FetchArticles(arg0, arg1 interface{}) *gomock
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FetchArticles", reflect.TypeOf((*MockArticle)(nil).FetchArticles), arg0, arg1)
 }
 
+// GetArticlesByID mocks base method.
+func (m *MockArticle) GetArticlesByID(arg0 context.Context, arg1 ...int64) ([]model.Article, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{arg0}
+	for _, a := range arg1 {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "GetArticlesByID", varargs...)
+	ret0, _ := ret[0].([]model.Article)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetArticlesByID indicates an expected call of GetArticlesByID.
+func (mr *MockArticleMockRecorder) GetArticlesByID(arg0 interface{}, arg1 ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{arg0}, arg1...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetArticlesByID", reflect.TypeOf((*MockArticle)(nil).GetArticlesByID), varargs...)
+}
+
 // InsertArticle mocks base method.
 func (m *MockArticle) InsertArticle(arg0 context.Context, arg1 model.Article) (*model.Article, error) {
 	m.ctrl.T.Helper()

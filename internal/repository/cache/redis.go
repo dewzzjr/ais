@@ -12,5 +12,5 @@ func (c *client[T]) Del(ctx context.Context, keys ...string) error {
 	return c.Client.Del(ctx, keys...).Err()
 }
 func (c *client[T]) Set(ctx context.Context, key string, obj T) error {
-	return c.Client.Set(ctx, key, &obj, 0).Err()
+	return c.Client.Set(ctx, key, &obj, c.Config.Expire).Err()
 }

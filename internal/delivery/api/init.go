@@ -33,7 +33,7 @@ func Run() bool {
 	cfg := config.Instance()
 	db := mysqlsvc.New(cfg.Database)
 	redis := redissvc.New(cfg.Redis)
-	cache := cache.New[model.Article](redis)
+	cache := cache.New[model.Article](redis, cfg.Redis)
 	r := sqldb.New(db)
 	u := articles.New(r, cache)
 	d := New(u, cfg.API)
