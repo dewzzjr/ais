@@ -8,3 +8,7 @@ bin/*
 # Environment Variable
 .env
 .env.backup
+
+# Local development file
+*.debug*
+.vscode

@@ -70,11 +70,13 @@ func TestInsertArticles(t *testing.T) {
 		mock.ExpectBegin()
 		mock.ExpectExec(
 			"INSERT INTO `articles` (.+) VALUES (.+)").
-			WillReturnResult(sqlmock.NewResult(1, 1))
+			WillReturnResult(sqlmock.NewResult(10, 1))
 		mock.ExpectCommit()
 		payload := model.Article{Author: "author test", Title: "title test", Body: "body test"}
 		r := sqldb.New(db)
-		err := r.InsertArticle(context.Background(), payload)
+		got, err := r.InsertArticle(context.Background(), payload)
 		assert.NoError(t, err)
+		assert.NotNil(t, got)
+		assert.EqualValues(t, 10, got.ID)
 	})
 }

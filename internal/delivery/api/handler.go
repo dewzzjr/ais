@@ -16,11 +16,14 @@ func (d *delivery) CreateArticles(w http.ResponseWriter, r *http.Request) {
 		response.Error(w, errs.Wrap(http.StatusBadRequest, err))
 		return
 	}
-	if err := d.Article.Insert(r.Context(), req.ToModel()); err != nil {
+	result, err := d.Article.Insert(r.Context(), req.ToModel())
+	if err != nil {
 		response.Error(w, err)
 		return
 	}
-	response.Success(w, http.StatusCreated)
+	response.Send(w, http.StatusCreated,
+		payload.ArticleResponse{}.FromModel(result),
+	)
 }
 
 func (d *delivery) FetchArticles(w http.ResponseWriter, r *http.Request) {

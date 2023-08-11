@@ -15,6 +15,7 @@ import (
 	"github.com/dewzzjr/ais/pkg/pointer"
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
+	"gorm.io/gorm"
 )
 
 func setup(t *testing.T) (*httptest.ResponseRecorder, *mocks.MockArticle) {
@@ -32,7 +33,8 @@ func TestCreateArticles(t *testing.T) {
 		r.Header.Set("content-type", "application/json")
 
 		// mock
-		m.EXPECT().Insert(gomock.Any(), model.Article{Author: "author test", Title: "title test", Body: "body test"}).Return(nil)
+		result := model.Article{Model: gorm.Model{ID: 1}}
+		m.EXPECT().Insert(gomock.Any(), model.Article{Author: "author test", Title: "title test", Body: "body test"}).Return(&result, nil)
 
 		// execute
 		api.New(m, config.API{}).CreateArticles(w, r)
@@ -63,7 +65,7 @@ func TestCreateArticles(t *testing.T) {
 		r.Header.Set("content-type", "application/json")
 
 		// mock
-		m.EXPECT().Insert(gomock.Any(), model.Article{Author: "author test", Title: "title test", Body: "body test"}).Return(errors.New("failed"))
+		m.EXPECT().Insert(gomock.Any(), model.Article{Author: "author test", Title: "title test", Body: "body test"}).Return(nil, errors.New("failed"))
 
 		// execute
 		api.New(m, config.API{}).CreateArticles(w, r)
@@ -80,7 +82,7 @@ func TestCreateArticles(t *testing.T) {
 		r.Header.Set("content-type", "application/json")
 
 		// mock
-		m.EXPECT().Insert(gomock.Any(), model.Article{Author: "author test", Title: "title test", Body: "body test"}).Return(errs.Wrap(http.StatusUnauthorized, errors.New("unauthorized")))
+		m.EXPECT().Insert(gomock.Any(), model.Article{Author: "author test", Title: "title test", Body: "body test"}).Return(nil, errs.Wrap(http.StatusUnauthorized, errors.New("unauthorized")))
 
 		// execute
 		api.New(m, config.API{}).CreateArticles(w, r)

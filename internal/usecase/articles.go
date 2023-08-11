@@ -9,5 +9,5 @@ import (
 
 type Article interface {
 	Fetch(context.Context, model.Filter) ([]model.Article, error)
-	Insert(context.Context, model.Article) error
+	Insert(context.Context, model.Article) (*model.Article, error)
 }

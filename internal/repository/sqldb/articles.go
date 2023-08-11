@@ -27,6 +27,9 @@ func (r *repo) FetchArticles(c context.Context, filter model.Filter) (result []m
 	return result, find.Error
 }
 
-func (r *repo) InsertArticle(c context.Context, payload model.Article) error {
-	return r.db.WithContext(c).Create(&payload).Error
+func (r *repo) InsertArticle(c context.Context, payload model.Article) (*model.Article, error) {
+	if err := r.db.WithContext(c).Create(&payload).Error; err != nil {
+		return nil, err
+	}
+	return &payload, nil
 }
