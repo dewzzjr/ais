@@ -19,6 +19,7 @@ func (d *delivery) Route() *mux.Router {
 	r.Use()
 	r.HandleFunc("/articles", d.FetchArticles).Methods(http.MethodGet)
 	r.HandleFunc("/articles", d.CreateArticles).Methods(http.MethodPost)
+	r.HandleFunc("/articles/{id:[0-9]+}", d.GetArticle).Methods(http.MethodGet)
 	d.Server.Handler = r
 	return r
 }

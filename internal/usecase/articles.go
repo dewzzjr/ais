@@ -10,4 +10,5 @@ import (
 type Article interface {
 	Fetch(context.Context, model.Filter) ([]model.Article, error)
 	Insert(context.Context, model.Article) (*model.Article, error)
+	Get(context.Context, int64) (*model.Article, error)
 }

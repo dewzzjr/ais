@@ -2,11 +2,15 @@ package articles
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"log"
+	"net/http"
 
 	"github.com/dewzzjr/ais/internal/model"
+	"github.com/dewzzjr/ais/internal/repository"
 	"github.com/dewzzjr/ais/pkg/collection"
+	"github.com/dewzzjr/ais/pkg/errs"
 	"github.com/dewzzjr/ais/pkg/pointer"
 )
 
@@ -24,25 +28,42 @@ func (u *usecase) Insert(c context.Context, payload model.Article) (*model.Artic
 	if err != nil {
 		return nil, err
 	}
-	if err := u.CacheArticle.Set(c,
+	cache[model.Article](c,
+		u.CacheArticle,
 		fmt.Sprintf(RedisKey, result.ID),
-		pointer.Val(result),
-	); err != nil {
-		log.Println("CacheArticle.Set", err)
-	}
+		result,
+	)
 	return result, nil
 }
 
 func (u *usecase) Get(c context.Context, id int64) (*model.Article, error) {
-	result, err := u.CacheArticle.Get(c,
+	r, err := u.CacheArticle.Get(c,
 		fmt.Sprintf(RedisKey, id),
 	)
 	if err == nil {
-		return &result, nil
+		return &r, nil
 	}
 	results, err := u.Article.GetArticlesByID(c, id)
 	if err != nil {
 		return nil, err
 	}
-	return collection.First(results), nil
+	result := collection.First(results)
+	if result == nil {
+		return nil, errs.Wrap(http.StatusNotFound, errors.New("article not found"))
+	}
+	cache[model.Article](c,
+		u.CacheArticle,
+		fmt.Sprintf(RedisKey, result.ID),
+		result,
+	)
+	return result, nil
+}
+
+func cache[T any](c context.Context, r repository.Cache[T], key string, result *T) {
+	if err := r.Set(c,
+		key,
+		pointer.Val(result),
+	); err != nil {
+		log.Println("Cache.Set", key, err)
+	}
 }

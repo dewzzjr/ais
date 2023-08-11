@@ -14,6 +14,7 @@ import (
 	"github.com/dewzzjr/ais/pkg/errs"
 	"github.com/dewzzjr/ais/pkg/pointer"
 	"github.com/golang/mock/gomock"
+	"github.com/gorilla/mux"
 	"github.com/stretchr/testify/assert"
 	"gorm.io/gorm"
 )
@@ -163,5 +164,93 @@ func TestFetchArticles(t *testing.T) {
 
 		// assert
 		assert.Equal(t, got.StatusCode, http.StatusUnauthorized)
+	})
+}
+
+func TestGetArticle(t *testing.T) {
+	t.Parallel()
+	t.Run("ShouldReturnOK_WhenSuccessGet_WhenValidID", func(t *testing.T) {
+		// setup
+		t.Parallel()
+		w, m := setup(t)
+		r := httptest.NewRequest(http.MethodGet, "/articles/123", nil)
+		r.Header.Set("content-type", "application/json")
+		r = mux.SetURLVars(r, map[string]string{"id": "123"})
+
+		// mock
+		m.EXPECT().Get(gomock.Any(), int64(123)).Return(&model.Article{}, nil)
+
+		// execute
+		api.New(m, config.API{}).GetArticle(w, r)
+		got := w.Result()
+
+		// assert
+		assert.Equal(t, got.StatusCode, http.StatusOK)
+	})
+	t.Run("ShouldReturnBadRequest_WhenInvalidID", func(t *testing.T) {
+		// setup
+		t.Parallel()
+		w, m := setup(t)
+		r := httptest.NewRequest(http.MethodGet, "/articles/invalid", nil)
+		r.Header.Set("content-type", "application/json")
+		r = mux.SetURLVars(r, map[string]string{"id": "invalid"})
+
+		// execute
+		api.New(m, config.API{}).GetArticle(w, r)
+		got := w.Result()
+
+		// assert
+		assert.Equal(t, got.StatusCode, http.StatusBadRequest)
+	})
+	t.Run("ShouldReturnBadRequest_WhenEmptyID", func(t *testing.T) {
+		// setup
+		t.Parallel()
+		w, m := setup(t)
+		r := httptest.NewRequest(http.MethodGet, "/articles/", nil)
+		r.Header.Set("content-type", "application/json")
+		r = mux.SetURLVars(r, map[string]string{"id": ""})
+
+		// execute
+		api.New(m, config.API{}).GetArticle(w, r)
+		got := w.Result()
+
+		// assert
+		assert.Equal(t, got.StatusCode, http.StatusBadRequest)
+	})
+	t.Run("ShouldReturnInternalServer_WhenFailedGet", func(t *testing.T) {
+		// setup
+		t.Parallel()
+		w, m := setup(t)
+		r := httptest.NewRequest(http.MethodGet, "/articles/123", nil)
+		r.Header.Set("content-type", "application/json")
+		r = mux.SetURLVars(r, map[string]string{"id": "123"})
+
+		// mock
+		m.EXPECT().Get(gomock.Any(), int64(123)).Return(nil, errors.New("failed"))
+
+		// execute
+		api.New(m, config.API{}).GetArticle(w, r)
+		got := w.Result()
+
+		// assert
+		assert.Equal(t, got.StatusCode, http.StatusInternalServerError)
+	})
+	t.Run("ShouldReturnNotFound_WhenGetNotFound", func(t *testing.T) {
+		// setup
+		t.Parallel()
+		w, m := setup(t)
+		r := httptest.NewRequest(http.MethodGet, "/articles/123", nil)
+		r.Header.Set("content-type", "application/json")
+		r = mux.SetURLVars(r, map[string]string{"id": "123"})
+
+		// mock
+		m.EXPECT().Get(gomock.Any(), int64(123)).Return(nil, errs.Wrap(http.StatusNotFound, errors.New("article not found")))
+
+		// execute
+		api.New(m, config.API{}).GetArticle(w, r)
+		got := w.Result()
+
+		// assert
+		assert.Equal(t, got.StatusCode, http.StatusNotFound)
 	})
 }
